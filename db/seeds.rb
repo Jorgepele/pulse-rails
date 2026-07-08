@@ -19,7 +19,7 @@ posts.each do |attrs|
   end
 
   # A couple of demo votes so vote_count is non-zero.
-  ["demo-1", "demo-2"].first(rand(0..2)).each do |token|
+  [ "demo-1", "demo-2" ].first(rand(0..2)).each do |token|
     post.votes.find_or_create_by!(voter_token: token)
   end
 end

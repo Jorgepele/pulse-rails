@@ -27,27 +27,23 @@ los generadores) en vez de reinventar el producto.
 
 ## What it does so far · Qué hace por ahora
 
-- Domain model: **Board → Post → Vote → Comment**, with an auto-generated slug
-  on boards, a default `open` status on posts, and `vote_count` / `comment_count`
-  on each post.
+- Domain model: **User, Board → Post → Vote → Comment**, with an auto-generated
+  slug on boards, a default `open` status on posts, and `vote_count` /
+  `comment_count` on each post.
+- **Token authentication** (`has_secure_password` + a per-user API token), with
+  `register` / `login` / `me` endpoints, mirroring the Django DRF token auth.
 - JSON REST API under `/api` to list public boards, list/create posts,
-  **toggle an upvote** (vote once, vote again to remove it), and list/add comments.
+  **toggle an upvote** (vote once, vote again to remove it), and list/add
+  comments. Reads are public; **writes require a token** and are attributed to
+  the current user.
 - Seed data (`bin/rails db:seed`) so the API has something to show.
-- Model and API tests (16 tests).
+- Model and API tests (27 tests).
 
-Authentication and the multi-tenant Organization model from the Django version
-are **not** ported yet, so posts, votes and comments are not tied to a user.
+The multi-tenant Organization model from the Django version is **not** ported
+yet — boards are global rather than owned by an organization.
 
-La autenticación y el modelo multi-tenant de Organización de la versión Django
-**todavía no** están portados, así que posts, votos y comentarios no están
-ligados a un usuario.
-
-### A note on votes · Nota sobre los votos
-
-In the Django version a vote belongs to a logged-in `User`. This port has no
-authentication yet, so a vote is identified by an opaque `voter_token` the
-client sends. One vote per `(post, voter_token)` pair, enforced by a unique
-index. When auth lands, this becomes a real user reference.
+El modelo multi-tenant de Organización de la versión Django **todavía no** está
+portado — los tableros son globales en vez de pertenecer a una organización.
 
 ## How MVC maps from Django to Rails · Cómo se traslada el MVC
 
@@ -59,40 +55,52 @@ index. When auth lands, this becomes a real user reference.
 | Serialization | DRF serializers | hand-written `*_json` helpers |
 | URL routing | `urls.py` | `config/routes.rb` |
 | Auto slug | `save()` override | `before_validation` callback |
+| Password hashing | Django auth (PBKDF2) | `has_secure_password` (bcrypt) |
+| Token auth | DRF `TokenAuthentication` | `Authenticatable` concern + header |
 
 ## Run it locally · Cómo ejecutarlo
 
 ```bash
 bundle install
 bin/rails db:migrate
-bin/rails db:seed        # optional: demo board + posts
+bin/rails db:seed        # optional: demo users, board, posts
 bin/rails server
 ```
 
-API at `http://127.0.0.1:3000/api/`.
+API at `http://127.0.0.1:3000/api/`. After seeding you can log in with
+`demo@pulse.dev` / `demo12345`.
 
 ## Main endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET`  | `/api/boards` | List public boards |
-| `GET`  | `/api/boards/:id` | A single board |
-| `GET`  | `/api/posts?board_id=:id` | List posts (optionally by board) |
-| `POST` | `/api/posts` | Create a feature request |
-| `POST` | `/api/posts/:id/vote` | Toggle a vote (send `voter_token`) |
-| `GET`  | `/api/comments?post=:id` | List comments on a post |
-| `POST` | `/api/comments` | Add a comment |
+Writes require an `Authorization: Token <token>` header, where the token comes
+from `register` or `login` (same scheme as the Django API).
 
-Example — create a post and vote for it:
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/auth/register` | — | Create an account, returns a token |
+| `POST` | `/api/auth/login` | — | Exchange email + password for a token |
+| `GET`  | `/api/auth/me` | token | The current user |
+| `GET`  | `/api/boards` | — | List public boards |
+| `GET`  | `/api/boards/:id` | — | A single board |
+| `GET`  | `/api/posts?board_id=:id` | — | List posts (optionally by board) |
+| `POST` | `/api/posts` | token | Create a feature request |
+| `POST` | `/api/posts/:id/vote` | token | Toggle your vote |
+| `GET`  | `/api/comments?post=:id` | — | List comments on a post |
+| `POST` | `/api/comments` | token | Add a comment |
+
+Example — register, then create a post and vote for it:
 
 ```bash
-curl -X POST http://127.0.0.1:3000/api/posts \
+TOKEN=$(curl -s -X POST http://127.0.0.1:3000/api/auth/register \
   -H "Content-Type: application/json" \
+  -d '{"email":"me@example.com","password":"secret123"}' | jq -r .token)
+
+curl -X POST http://127.0.0.1:3000/api/posts \
+  -H "Content-Type: application/json" -H "Authorization: Token $TOKEN" \
   -d '{"post":{"board_id":1,"title":"Dark mode"}}'
 
 curl -X POST http://127.0.0.1:3000/api/posts/1/vote \
-  -H "Content-Type: application/json" \
-  -d '{"voter_token":"me"}'
+  -H "Authorization: Token $TOKEN"
 ```
 
 ## Tests
@@ -103,8 +111,8 @@ bin/rails test
 
 ## Ideas for next steps · Siguientes pasos
 
-Port the remaining pieces from the Django version — authentication and the
-multi-tenant Organization model — and deploy a live demo.
+Port the remaining piece from the Django version — the multi-tenant
+Organization model (boards owned by an org) — and deploy a live demo.
 
 ---
 

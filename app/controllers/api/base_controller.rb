@@ -29,12 +29,19 @@ module Api
         status: post.status,
         vote_count: post.vote_count,
         comment_count: post.comments.count,
+        author: post.author&.email,
         created_at: post.created_at
       }
     end
 
     def comment_json(comment)
-      { id: comment.id, post_id: comment.post_id, body: comment.body, created_at: comment.created_at }
+      {
+        id: comment.id,
+        post_id: comment.post_id,
+        body: comment.body,
+        author: comment.author&.email,
+        created_at: comment.created_at
+      }
     end
 
     def user_json(user)

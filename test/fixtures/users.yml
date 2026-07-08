@@ -2,3 +2,8 @@ jorge:
   email: jorge@example.com
   password_digest: <%= BCrypt::Password.create("secret123") %>
   token: jorge-token
+
+alice:
+  email: alice@example.com
+  password_digest: <%= BCrypt::Password.create("secret123") %>
+  token: alice-token

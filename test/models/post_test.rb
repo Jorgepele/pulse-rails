@@ -14,7 +14,7 @@ class PostTest < ActiveSupport::TestCase
   test "vote_count reflects the number of votes" do
     post = posts(:dark_mode)
     assert_equal 1, post.vote_count
-    post.votes.create!(voter_token: "another")
+    post.votes.create!(user: users(:alice))
     assert_equal 2, post.vote_count
   end
 end

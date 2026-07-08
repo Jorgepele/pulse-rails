@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_102842) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_103135) do
   create_table "boards", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.boolean "is_public", default: true, null: false
@@ -21,20 +21,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_102842) do
   end
 
   create_table "comments", force: :cascade do |t|
+    t.integer "author_id"
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.integer "post_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_comments_on_author_id"
     t.index ["post_id"], name: "index_comments_on_post_id"
   end
 
   create_table "posts", force: :cascade do |t|
+    t.integer "author_id"
     t.integer "board_id", null: false
     t.text "body"
     t.datetime "created_at", null: false
     t.string "status", default: "open", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_posts_on_author_id"
     t.index ["board_id"], name: "index_posts_on_board_id"
   end
 
@@ -52,12 +56,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_102842) do
     t.datetime "created_at", null: false
     t.integer "post_id", null: false
     t.datetime "updated_at", null: false
-    t.string "voter_token", null: false
-    t.index ["post_id", "voter_token"], name: "index_votes_on_post_id_and_voter_token", unique: true
+    t.integer "user_id", null: false
+    t.index ["post_id", "user_id"], name: "index_votes_on_post_id_and_user_id", unique: true
     t.index ["post_id"], name: "index_votes_on_post_id"
+    t.index ["user_id"], name: "index_votes_on_user_id"
   end
 
   add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users", column: "author_id"
   add_foreign_key "posts", "boards"
+  add_foreign_key "posts", "users", column: "author_id"
   add_foreign_key "votes", "posts"
+  add_foreign_key "votes", "users"
 end

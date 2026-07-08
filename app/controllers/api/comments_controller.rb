@@ -1,5 +1,7 @@
 module Api
   class CommentsController < BaseController
+    before_action :authenticate!, only: :create
+
     # GET /api/comments?post=:id
     def index
       comments = Comment.all
@@ -10,6 +12,7 @@ module Api
     # POST /api/comments
     def create
       comment = Comment.new(comment_params)
+      comment.author = current_user
       comment.save!
       render json: comment_json(comment), status: :created
     end

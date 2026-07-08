@@ -2,6 +2,7 @@
 # Author is omitted until this app has authentication (see README).
 class Comment < ApplicationRecord
   belongs_to :post
+  belongs_to :author, class_name: "User", optional: true
 
   validates :body, presence: true
 

@@ -113,10 +113,15 @@ curl -X POST http://127.0.0.1:3000/api/posts/1/vote \
 bin/rails test
 ```
 
+## Deploy · Despliegue
+
+Set up to deploy on [Render](https://render.com) (Ruby runtime, Puma, SQLite
+re-seeded on each build). Step-by-step guide in [DEPLOY.md](DEPLOY.md).
+
 ## Ideas for next steps · Siguientes pasos
 
-Deploy a live demo, and add organization-scoped listing (only show boards of
-the organizations you belong to).
+Add a live demo URL here once deployed, and organization-scoped board listing
+(only show boards of the organizations you belong to).
 
 ---
 

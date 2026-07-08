@@ -1,0 +1,9 @@
+requests:
+  name: Feature Requests
+  slug: feature-requests
+  is_public: true
+
+private_board:
+  name: Internal
+  slug: internal
+  is_public: false

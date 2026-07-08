@@ -1,0 +1,11 @@
+dark_mode:
+  board: requests
+  title: Dark mode
+  body: Please add a dark theme.
+  status: planned
+
+csv_export:
+  board: requests
+  title: CSV export
+  body: Export all feedback to CSV.
+  status: open

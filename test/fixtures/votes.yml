@@ -1,0 +1,3 @@
+dark_mode_vote:
+  post: dark_mode
+  voter_token: seed-voter

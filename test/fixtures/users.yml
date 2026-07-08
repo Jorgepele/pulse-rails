@@ -1,0 +1,4 @@
+jorge:
+  email: jorge@example.com
+  password_digest: <%= BCrypt::Password.create("secret123") %>
+  token: jorge-token

@@ -1,6 +1,8 @@
 module Api
   # Shared base for the JSON API: consistent error responses and helpers.
   class BaseController < ApplicationController
+    include Authenticatable
+
     rescue_from ActiveRecord::RecordNotFound do |e|
       render json: { error: e.message }, status: :not_found
     end
@@ -33,6 +35,10 @@ module Api
 
     def comment_json(comment)
       { id: comment.id, post_id: comment.post_id, body: comment.body, created_at: comment.created_at }
+    end
+
+    def user_json(user)
+      { id: user.id, email: user.email, token: user.token }
     end
   end
 end

@@ -7,6 +7,10 @@ Rails.application.routes.draw do
 
   # JSON API, namespaced under /api to mirror the Django pulse-api service.
   namespace :api do
+    post "auth/register", to: "auth#register"
+    post "auth/login", to: "auth#login"
+    get  "auth/me", to: "auth#me"
+
     resources :boards, only: [ :index, :show ]
     resources :posts, only: [ :index, :show, :create ] do
       post :vote, on: :member  # POST /api/posts/:id/vote — toggle

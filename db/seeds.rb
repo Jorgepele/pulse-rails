@@ -8,7 +8,14 @@ alice = User.find_or_create_by!(email: "alice@pulse.dev") do |u|
   u.password = "demo12345"
 end
 
-board = Board.find_or_create_by!(slug: "feature-requests") do |b|
+# The demo user's tenant (owner + membership), like a real signup.
+org = Organization.find_or_create_by!(slug: "demo-workspace") do |o|
+  o.name = "Demo Workspace"
+  o.owner = demo
+end
+org.memberships.find_or_create_by!(user: demo) { |m| m.role = "owner" }
+
+board = org.boards.find_or_create_by!(slug: "feature-requests") do |b|
   b.name = "Feature Requests"
 end
 
@@ -40,5 +47,5 @@ if dark_mode
   end
 end
 
-puts "Seeded #{User.count} users, #{Board.count} board, #{Post.count} posts, " \
-     "#{Vote.count} votes, #{Comment.count} comments."
+puts "Seeded #{User.count} users, #{Organization.count} org, #{Board.count} board, " \
+     "#{Post.count} posts, #{Vote.count} votes, #{Comment.count} comments."

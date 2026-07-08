@@ -27,23 +27,26 @@ los generadores) en vez de reinventar el producto.
 
 ## What it does so far · Qué hace por ahora
 
-- Domain model: **User, Board → Post → Vote → Comment**, with an auto-generated
-  slug on boards, a default `open` status on posts, and `vote_count` /
-  `comment_count` on each post.
+- **Multi-tenant** domain: **Organization → Board → Post → Vote → Comment**,
+  with users joined to organizations through **memberships** (owner/admin/member).
+  Signing up creates your personal organization; boards belong to an org and
+  their slug is unique per org.
+- Auto-generated slug on boards and orgs, a default `open` status on posts, and
+  `vote_count` / `comment_count` on each post.
 - **Token authentication** (`has_secure_password` + a per-user API token), with
   `register` / `login` / `me` endpoints, mirroring the Django DRF token auth.
 - JSON REST API under `/api` to list public boards, list/create posts,
   **toggle an upvote** (vote once, vote again to remove it), and list/add
-  comments. Reads are public; **writes require a token** and are attributed to
-  the current user.
+  comments, and create a board under your organization. Reads are public;
+  **writes require a token** and are attributed to the current user.
 - Seed data (`bin/rails db:seed`) so the API has something to show.
-- Model and API tests (27 tests).
+- Model and API tests (34 tests).
 
-The multi-tenant Organization model from the Django version is **not** ported
-yet — boards are global rather than owned by an organization.
+This now covers the full Django domain, including the multi-tenant core
+(organizations + memberships).
 
-El modelo multi-tenant de Organización de la versión Django **todavía no** está
-portado — los tableros son globales en vez de pertenecer a una organización.
+Esto cubre ya todo el dominio de Django, incluyendo el núcleo multi-tenant
+(organizaciones + membresías).
 
 ## How MVC maps from Django to Rails · Cómo se traslada el MVC
 
@@ -82,6 +85,7 @@ from `register` or `login` (same scheme as the Django API).
 | `GET`  | `/api/auth/me` | token | The current user |
 | `GET`  | `/api/boards` | — | List public boards |
 | `GET`  | `/api/boards/:id` | — | A single board |
+| `POST` | `/api/boards` | token | Create a board under your organization |
 | `GET`  | `/api/posts?board_id=:id` | — | List posts (optionally by board) |
 | `POST` | `/api/posts` | token | Create a feature request |
 | `POST` | `/api/posts/:id/vote` | token | Toggle your vote |
@@ -111,8 +115,8 @@ bin/rails test
 
 ## Ideas for next steps · Siguientes pasos
 
-Port the remaining piece from the Django version — the multi-tenant
-Organization model (boards owned by an org) — and deploy a live demo.
+Deploy a live demo, and add organization-scoped listing (only show boards of
+the organizations you belong to).
 
 ---
 

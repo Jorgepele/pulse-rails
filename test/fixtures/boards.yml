@@ -2,8 +2,10 @@ requests:
   name: Feature Requests
   slug: feature-requests
   is_public: true
+  organization: acme
 
 private_board:
   name: Internal
   slug: internal
   is_public: false
+  organization: acme

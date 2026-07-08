@@ -11,7 +11,7 @@ Rails.application.routes.draw do
     post "auth/login", to: "auth#login"
     get  "auth/me", to: "auth#me"
 
-    resources :boards, only: [ :index, :show ]
+    resources :boards, only: [ :index, :show, :create ]
     resources :posts, only: [ :index, :show, :create ] do
       post :vote, on: :member  # POST /api/posts/:id/vote — toggle
     end

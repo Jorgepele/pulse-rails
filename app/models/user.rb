@@ -4,6 +4,10 @@
 class User < ApplicationRecord
   has_secure_password
 
+  has_many :owned_organizations, class_name: "Organization", foreign_key: :owner_id, dependent: :destroy
+  has_many :memberships, dependent: :destroy
+  has_many :organizations, through: :memberships
+
   validates :email, presence: true, uniqueness: { case_sensitive: false },
                     format: { with: URI::MailTo::EMAIL_REGEXP }
 

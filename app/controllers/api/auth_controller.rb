@@ -3,9 +3,15 @@ module Api
     before_action :authenticate!, only: :me
 
     # POST /api/auth/register
+    # Creates the user together with a personal organization they own, so
+    # every account has a tenant to create boards under (multi-tenant core).
     def register
       user = User.new(email: params[:email], password: params[:password])
-      user.save!
+      ActiveRecord::Base.transaction do
+        user.save!
+        org = Organization.create!(name: "#{user.email}'s workspace", owner: user)
+        org.memberships.create!(user: user, role: "owner")
+      end
       render json: user_json(user), status: :created
     end
 

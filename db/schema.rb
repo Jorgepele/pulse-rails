@@ -10,14 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_103135) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_120018) do
   create_table "boards", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.boolean "is_public", default: true, null: false
     t.string "name", null: false
+    t.integer "organization_id", null: false
     t.string "slug", null: false
     t.datetime "updated_at", null: false
-    t.index ["slug"], name: "index_boards_on_slug", unique: true
+    t.index ["organization_id", "slug"], name: "index_boards_on_organization_id_and_slug", unique: true
+    t.index ["organization_id"], name: "index_boards_on_organization_id"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -28,6 +30,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_103135) do
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_comments_on_author_id"
     t.index ["post_id"], name: "index_comments_on_post_id"
+  end
+
+  create_table "memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "organization_id", null: false
+    t.string "role", default: "member", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["organization_id"], name: "index_memberships_on_organization_id"
+    t.index ["user_id", "organization_id"], name: "index_memberships_on_user_id_and_organization_id", unique: true
+    t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "organizations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "owner_id", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_organizations_on_owner_id"
+    t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
   create_table "posts", force: :cascade do |t|
@@ -62,8 +85,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_103135) do
     t.index ["user_id"], name: "index_votes_on_user_id"
   end
 
+  add_foreign_key "boards", "organizations"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users", column: "author_id"
+  add_foreign_key "memberships", "organizations"
+  add_foreign_key "memberships", "users"
+  add_foreign_key "organizations", "users", column: "owner_id"
   add_foreign_key "posts", "boards"
   add_foreign_key "posts", "users", column: "author_id"
   add_foreign_key "votes", "posts"

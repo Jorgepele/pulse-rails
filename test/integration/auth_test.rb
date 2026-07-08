@@ -9,6 +9,16 @@ class AuthTest < ActionDispatch::IntegrationTest
     assert JSON.parse(response.body)["token"].present?
   end
 
+  test "register also creates a personal organization owned by the user" do
+    assert_difference [ "Organization.count", "Membership.count" ], 1 do
+      post "/api/auth/register", params: { email: "founder@example.com", password: "secret123" }
+    end
+    user = User.find_by(email: "founder@example.com")
+    org = user.organizations.first
+    assert_equal user, org.owner
+    assert_equal "owner", user.memberships.first.role
+  end
+
   test "register rejects a bad email" do
     post "/api/auth/register", params: { email: "nope", password: "secret123" }
     assert_response :unprocessable_content

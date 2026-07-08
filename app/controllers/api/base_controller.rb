@@ -17,7 +17,13 @@ module Api
     # (jbuilder / active_model_serializers); kept explicit here so the
     # JSON shape is obvious and matches the Django API.
     def board_json(board)
-      { id: board.id, name: board.name, slug: board.slug, is_public: board.is_public }
+      {
+        id: board.id,
+        name: board.name,
+        slug: board.slug,
+        is_public: board.is_public,
+        organization_id: board.organization_id
+      }
     end
 
     def post_json(post)

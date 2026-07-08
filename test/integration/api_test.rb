@@ -14,6 +14,21 @@ class ApiTest < ActionDispatch::IntegrationTest
     assert_not_includes slugs, "internal"
   end
 
+  test "POST /api/boards creates a board under the user's organization" do
+    assert_difference "Board.count", 1 do
+      post "/api/boards", params: { board: { name: "Bugs" } }, headers: auth
+    end
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal "bugs", body["slug"]
+    assert_equal organizations(:acme).id, body["organization_id"]
+  end
+
+  test "POST /api/boards requires authentication" do
+    post "/api/boards", params: { board: { name: "Nope" } }
+    assert_response :unauthorized
+  end
+
   test "POST /api/posts requires authentication" do
     post "/api/posts", params: { post: { board_id: boards(:requests).id, title: "Nope" } }
     assert_response :unauthorized

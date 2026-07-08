@@ -27,18 +27,20 @@ los generadores) en vez de reinventar el producto.
 
 ## What it does so far · Qué hace por ahora
 
-- Domain model: **Board → Post → Vote**, with an auto-generated slug on boards,
-  a default `open` status on posts, and a `vote_count` on each post.
-- JSON REST API under `/api` to list public boards, list/create posts, and
-  **toggle an upvote** (vote once, vote again to remove it).
+- Domain model: **Board → Post → Vote → Comment**, with an auto-generated slug
+  on boards, a default `open` status on posts, and `vote_count` / `comment_count`
+  on each post.
+- JSON REST API under `/api` to list public boards, list/create posts,
+  **toggle an upvote** (vote once, vote again to remove it), and list/add comments.
 - Seed data (`bin/rails db:seed`) so the API has something to show.
-- Model and API tests (12 tests).
+- Model and API tests (16 tests).
 
-This is a focused first slice. Comments, authentication and the multi-tenant
-Organization model from the Django version are **not** ported yet.
+Authentication and the multi-tenant Organization model from the Django version
+are **not** ported yet, so posts, votes and comments are not tied to a user.
 
-Es un primer corte enfocado. Los comentarios, la autenticación y el modelo
-multi-tenant de Organización de la versión Django **todavía no** están portados.
+La autenticación y el modelo multi-tenant de Organización de la versión Django
+**todavía no** están portados, así que posts, votos y comentarios no están
+ligados a un usuario.
 
 ### A note on votes · Nota sobre los votos
 
@@ -78,6 +80,8 @@ API at `http://127.0.0.1:3000/api/`.
 | `GET`  | `/api/posts?board_id=:id` | List posts (optionally by board) |
 | `POST` | `/api/posts` | Create a feature request |
 | `POST` | `/api/posts/:id/vote` | Toggle a vote (send `voter_token`) |
+| `GET`  | `/api/comments?post=:id` | List comments on a post |
+| `POST` | `/api/comments` | Add a comment |
 
 Example — create a post and vote for it:
 
@@ -99,8 +103,8 @@ bin/rails test
 
 ## Ideas for next steps · Siguientes pasos
 
-Port the remaining pieces from the Django version — comments, authentication,
-and the multi-tenant Organization model — and deploy a live demo.
+Port the remaining pieces from the Django version — authentication and the
+multi-tenant Organization model — and deploy a live demo.
 
 ---
 

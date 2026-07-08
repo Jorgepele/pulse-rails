@@ -11,5 +11,6 @@ Rails.application.routes.draw do
     resources :posts, only: [ :index, :show, :create ] do
       post :vote, on: :member  # POST /api/posts/:id/vote — toggle
     end
+    resources :comments, only: [ :index, :create ]
   end
 end

@@ -1,0 +1,9 @@
+first:
+  post: dark_mode
+  body: I would love this.
+  created_at: <%= 2.hours.ago %>
+
+second:
+  post: dark_mode
+  body: Same here, +1.
+  created_at: <%= 1.hour.ago %>

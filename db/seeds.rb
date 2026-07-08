@@ -24,4 +24,13 @@ posts.each do |attrs|
   end
 end
 
-puts "Seeded #{Board.count} board, #{Post.count} posts, #{Vote.count} votes."
+# A short comment thread on the first post.
+dark_mode = Post.find_by(title: "Dark mode")
+if dark_mode
+  [ "Yes please, my eyes!", "Would use this daily." ].each do |body|
+    dark_mode.comments.find_or_create_by!(body: body)
+  end
+end
+
+puts "Seeded #{Board.count} board, #{Post.count} posts, " \
+     "#{Vote.count} votes, #{Comment.count} comments."

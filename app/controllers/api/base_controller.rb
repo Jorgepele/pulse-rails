@@ -26,8 +26,13 @@ module Api
         body: post.body,
         status: post.status,
         vote_count: post.vote_count,
+        comment_count: post.comments.count,
         created_at: post.created_at
       }
+    end
+
+    def comment_json(comment)
+      { id: comment.id, post_id: comment.post_id, body: comment.body, created_at: comment.created_at }
     end
   end
 end

@@ -36,4 +36,22 @@ class ApiTest < ActionDispatch::IntegrationTest
     get "/api/posts/999999"
     assert_response :not_found
   end
+
+  test "GET /api/comments filters by post" do
+    get "/api/comments", params: { post: posts(:dark_mode).id }
+    assert_response :success
+    bodies = JSON.parse(response.body).map { |c| c["body"] }
+    assert_equal [ "I would love this.", "Same here, +1." ], bodies
+  end
+
+  test "POST /api/comments adds a comment and bumps comment_count" do
+    target = posts(:csv_export)
+    assert_difference -> { target.comments.count }, 1 do
+      post "/api/comments", params: { comment: { post_id: target.id, body: "Please!" } }
+    end
+    assert_response :created
+
+    get "/api/posts/#{target.id}"
+    assert_equal 1, JSON.parse(response.body)["comment_count"]
+  end
 end

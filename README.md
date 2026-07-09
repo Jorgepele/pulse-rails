@@ -42,11 +42,50 @@ los generadores) en vez de reinventar el producto.
 - Seed data (`bin/rails db:seed`) so the API has something to show.
 - Model and API tests (34 tests).
 
-This now covers the full Django domain, including the multi-tenant core
-(organizations + memberships).
+This now covers the core Django domain, including the multi-tenant part
+(organizations + memberships). The billing tables from the Django version
+aren't ported here.
 
-Esto cubre ya todo el dominio de Django, incluyendo el núcleo multi-tenant
-(organizaciones + membresías).
+Esto cubre ya el núcleo del dominio de Django, incluyendo la parte multi-tenant
+(organizaciones + membresías). Las tablas de facturación de la versión Django no
+están portadas aquí.
+
+## Data model · Modelo de datos
+
+The same multi-tenant feedback schema as the Django original, expressed here
+with Active Record models. Every board and post belongs to an organization;
+users join organizations through memberships. (The billing tables from the
+Django version aren't ported here — this repo focuses on the core domain.)
+
+```mermaid
+erDiagram
+    User ||--o{ Organization : owns
+    User ||--o{ Membership : "joins via"
+    Organization ||--o{ Membership : has
+    Organization ||--o{ Board : owns
+    Board ||--o{ Post : contains
+    User ||--o{ Post : authors
+    Post ||--o{ Vote : receives
+    User ||--o{ Vote : casts
+    Post ||--o{ Comment : has
+    User ||--o{ Comment : writes
+
+    Organization {
+        string name
+        string slug
+    }
+    Membership {
+        string role "owner / admin / member"
+    }
+    Board {
+        string name
+        bool is_public
+    }
+    Post {
+        string title
+        string status "open / planned / done ..."
+    }
+```
 
 ## How MVC maps from Django to Rails · Cómo se traslada el MVC
 

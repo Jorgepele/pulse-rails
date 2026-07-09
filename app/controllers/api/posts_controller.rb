@@ -2,10 +2,11 @@ module Api
   class PostsController < BaseController
     before_action :authenticate!, only: [ :create, :vote ]
 
-    # GET /api/posts  (optionally ?board_id=)
+    # GET /api/posts  (optionally ?board_id= and/or ?status=)
     def index
       posts = Post.all
       posts = posts.where(board_id: params[:board_id]) if params[:board_id].present?
+      posts = posts.where(status: params[:status]) if params[:status].present?
       render json: posts.map { |p| post_json(p) }
     end
 

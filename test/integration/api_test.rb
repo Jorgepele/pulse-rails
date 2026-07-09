@@ -59,6 +59,14 @@ class ApiTest < ActionDispatch::IntegrationTest
     assert_equal 0, body["vote_count"]
   end
 
+  test "GET /api/posts filters by status" do
+    get "/api/posts", params: { status: "planned" }
+    assert_response :success
+    titles = JSON.parse(response.body).map { |p| p["title"] }
+    assert_includes titles, "Dark mode"       # planned
+    assert_not_includes titles, "CSV export"  # open
+  end
+
   test "unknown post returns 404" do
     get "/api/posts/999999"
     assert_response :not_found

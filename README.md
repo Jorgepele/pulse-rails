@@ -35,7 +35,10 @@ los generadores) en vez de reinventar el producto.
   `vote_count` / `comment_count` on each post.
 - **Token authentication** (`has_secure_password` + a per-user API token), with
   `register` / `login` / `me` endpoints, mirroring the Django DRF token auth.
-- JSON REST API under `/api` to list public boards, list/create posts,
+- **Tenant scoping**: a board is visible if it is public, or if you belong to the
+  organization that owns it; posts and comments inherit their board's visibility.
+  The rule lives in the `Board.visible_to` scope, a port of Django's `visible_to`.
+- JSON REST API under `/api` to list visible boards, list/create posts,
   **toggle an upvote** (vote once, vote again to remove it), and list/add
   comments, and create a board under your organization. Reads are public;
   **writes require a token** and are attributed to the current user.
@@ -122,7 +125,7 @@ from `register` or `login` (same scheme as the Django API).
 | `POST` | `/api/auth/register` | — | Create an account, returns a token |
 | `POST` | `/api/auth/login` | — | Exchange email + password for a token |
 | `GET`  | `/api/auth/me` | token | The current user |
-| `GET`  | `/api/boards` | — | List public boards |
+| `GET`  | `/api/boards` | — | List boards visible to the caller |
 | `GET`  | `/api/boards/:id` | — | A single board |
 | `POST` | `/api/boards` | token | Create a board under your organization |
 | `GET`  | `/api/posts?board_id=:id&status=:status` | — | List posts, filtered by board and/or status |

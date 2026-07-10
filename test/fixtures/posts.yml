@@ -9,3 +9,9 @@ csv_export:
   title: CSV export
   body: Export all feedback to CSV.
   status: open
+
+secret:
+  board: private_board
+  title: Secret roadmap item
+  body: Internal only.
+  status: open

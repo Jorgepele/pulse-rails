@@ -13,6 +13,11 @@ module Api
 
     private
 
+    # Every read goes through here: the boards the caller is allowed to see.
+    def visible_boards
+      Board.visible_to(current_user)
+    end
+
     # Small hand-written serializers. A real app might use a gem
     # (jbuilder / active_model_serializers); kept explicit here so the
     # JSON shape is obvious and matches the Django API.

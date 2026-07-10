@@ -4,7 +4,7 @@ module Api
 
     # GET /api/posts  (optionally ?board_id= and/or ?status=)
     def index
-      posts = Post.all
+      posts = visible_posts
       posts = posts.where(board_id: params[:board_id]) if params[:board_id].present?
       posts = posts.where(status: params[:status]) if params[:status].present?
       render json: posts.map { |p| post_json(p) }
@@ -12,12 +12,15 @@ module Api
 
     # GET /api/posts/:id
     def show
-      post = Post.find(params[:id])
+      post = visible_posts.find(params[:id])
       render json: post_json(post)
     end
 
-    # POST /api/posts
+    # POST /api/posts — only on a board the user can see.
     def create
+      raise ActiveRecord::RecordNotFound, "Board not found" unless
+        visible_boards.exists?(id: post_params[:board_id])
+
       post = Post.new(post_params)
       post.author = current_user
       post.save!
@@ -27,7 +30,7 @@ module Api
     # POST /api/posts/:id/vote  — adds the current user's vote, or removes it
     # if it already exists (toggle). Mirrors the Django vote-toggle endpoint.
     def vote
-      post = Post.find(params[:id])
+      post = visible_posts.find(params[:id])
 
       existing = post.votes.find_by(user: current_user)
       if existing
@@ -42,6 +45,11 @@ module Api
     end
 
     private
+
+    # Posts inherit their board's visibility.
+    def visible_posts
+      Post.where(board: visible_boards)
+    end
 
     def post_params
       params.require(:post).permit(:board_id, :title, :body, :status)

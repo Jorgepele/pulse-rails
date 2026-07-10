@@ -4,7 +4,7 @@ module Api
 
     # GET /api/posts  (optionally ?board_id= and/or ?status=)
     def index
-      posts = visible_posts
+      posts = visible_posts_for_list
       posts = posts.where(board_id: params[:board_id]) if params[:board_id].present?
       posts = posts.where(status: params[:status]) if params[:status].present?
       render json: posts.map { |p| post_json(p) }
@@ -49,6 +49,12 @@ module Api
     # Posts inherit their board's visibility.
     def visible_posts
       Post.where(board: visible_boards)
+    end
+
+    # Preloads the associations the JSON needs, so serializing a page of posts
+    # costs a fixed number of queries instead of one per post (N+1).
+    def visible_posts_for_list
+      visible_posts.includes(:author, :votes, :comments)
     end
 
     def post_params

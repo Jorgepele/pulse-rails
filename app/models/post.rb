@@ -12,8 +12,15 @@ class Post < ApplicationRecord
 
   default_scope { order(created_at: :desc) }
 
-  # Number of upvotes, mirroring Django's `vote_count` property.
+  # Counts used by the JSON serializers. `size` reuses the association when it has
+  # already been loaded (see the `includes` in the controllers) and only falls back
+  # to a COUNT query otherwise — `count` would always hit the database, once per
+  # post, which is the N+1 problem.
   def vote_count
-    votes.count
+    votes.size
+  end
+
+  def comment_count
+    comments.size
   end
 end

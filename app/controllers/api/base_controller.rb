@@ -39,7 +39,7 @@ module Api
         body: post.body,
         status: post.status,
         vote_count: post.vote_count,
-        comment_count: post.comments.count,
+        comment_count: post.comment_count,
         author: post.author&.email,
         created_at: post.created_at
       }
